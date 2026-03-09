@@ -32,4 +32,23 @@ public class Respuesta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "autor_id")
     private Usuario autor;
+
+
+    public Respuesta(DatosRegistroRespuesta datos, Usuario autor, Topico topico) {
+        this.mensaje = datos.mensaje();
+        this.fechaCreacion = LocalDateTime.now();
+        this.solucion = false;
+        this.topico = topico;
+        this.autor = autor;
+    }
+
+
+    public void actualizarInformaciones(DatosActualizarRespuesta datos) {
+        if (datos.mensaje() != null) {
+            this.mensaje = datos.mensaje();
+        }
+        if (datos.solucion() != null) {
+            this.solucion = datos.solucion();
+        }
+    }
 }

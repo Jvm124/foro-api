@@ -1,42 +1,76 @@
 # Foro Hub API 🚀
 
-Bienvenido al proyecto **Foro Hub**, una API REST robusta desarrollada con **Java** y **Spring Boot** para la gestión de un foro de discusión académica. Este proyecto permite la interacción con tópicos de consulta, siguiendo las mejores prácticas de desarrollo y Clean Code.
+Bienvenido al proyecto **Foro Hub**, una API REST robusta desarrollada con **Java** y **Spring Boot** para la gestión de un foro de discusión académica. Este proyecto permite la interacción con tópicos de consulta, siguiendo las mejores prácticas de desarrollo, Clean Code y principios SOLID.
 
 ## 📋 Características
 
-* **CRUD de Tópicos**: Gestión integral de temas de discusión (Crear, Leer, Actualizar y Eliminar).
-* **Validaciones de Negocio**: Control de integridad para asegurar que cada tópico esté asociado a un autor y curso existentes en la base de datos.
-* **Borrado Lógico**: Implementación de `eliminacionLogica()` para mantener la integridad de los datos históricos sin eliminarlos físicamente.
-* **Paginación y Ordenamiento**: Consultas optimizadas utilizando `Pageable` para manejar grandes volúmenes de datos.
+* **CRUD Completo**: Gestión integral de Tópicos, Usuarios, Cursos, Respuestas y Perfiles.
+* **Seguridad con JWT**: Autenticación Stateless mediante JSON Web Tokens para proteger los recursos de la API.
+* **Control de Acceso (RBAC)**: Restricción de endpoints basada en perfiles (ESTUDIANTE, MODERADOR, ADMINISTRADOR).
+* **Validaciones de Negocio**: Control estricto de integridad para asegurar que cada entidad cumpla con las reglas del dominio antes de la persistencia.
+* **Borrado Lógico**: Implementación de `eliminacionLogica()` para mantener la integridad referencial y datos históricos.
+* **Paginación y Ordenamiento**: Consultas optimizadas utilizando `Pageable` para manejar eficientemente grandes volúmenes de datos.
 
 ## 🛠️ Tecnologías Utilizadas
 
-* **Java 17**
-* **Spring Boot 3**
-* **Spring Data JPA** (Hibernate)
-* **MySQL** (Base de datos relacional)
-* **Flyway**: Control de versiones de la base de datos (Migraciones SQL).
-* **Lombok**: Reducción de código boilerplate mediante anotaciones como `@Getter` y `@NoArgsConstructor`.
-* **Jakarta Validation**: Reglas de validación para los datos de entrada.
+* **Java 21**: Utilizando las últimas características del lenguaje.
+* **Spring Boot 3**: Framework base para la creación de microservicios.
+* **Spring Security**: Configuración de filtros personalizados para la validación de tokens.
+* **Spring Data JPA**: Abstracción de persistencia con Hibernate.
+* **MySQL**: Base de datos relacional para el almacenamiento persistente.
+* **Flyway**: Control de versiones de la base de datos mediante migraciones SQL.
+* **Lombok**: Reducción de código boilerplate para entidades y DTOs.
+* **Jakarta Validation**: Reglas de validación para asegurar la calidad de los datos de entrada.
 
 ## 🏗️ Estructura del Proyecto
 
+El proyecto se organiza siguiendo el principio de separación de responsabilidades:
+* **Controller**: Clases que gestionan los endpoints y las respuestas HTTP (ej. `TopicoController`, `UsuarioController`, `CursoController`).
+* **Domain**: Contiene las entidades JPA, repositorios y Records (DTOs) para la transferencia de datos.
+* **Infra**: Configuración de infraestructura, seguridad (`SecurityFilter`, `TokenService`) y manejo global de excepciones.
+* **Service**: Capa de lógica de negocio (ej. `RegistroDeTopicos`, `RegistroDeUsuarios`, `RegistroDeCursos`).
 
 
-El proyecto está organizado siguiendo el principio de separación de responsabilidades:
-* **Controller**: Clases como `TopicoController` que gestionan los endpoints y las respuestas HTTP.
-* **Domain**: Contiene las entidades JPA (`Topico`), repositorios y registros DTO para la transferencia de datos.
-* **Service**: Capa de lógica de negocio, como `RegistroDeTopicos`, que orquesta las reglas antes de la persistencia.
 
 ## 🛣️ Endpoints Principales
 
-| Método | Endpoint | Acción | Regla de Negocio |
+### Autenticación
+| Método | Endpoint | Acción | Acceso |
 | :--- | :--- | :--- | :--- |
-| **POST** | `/topicos` | Registrar Tópico | Valida existencia de autor y curso. |
-| **GET** | `/topicos` | Listar Activos | Devuelve tópicos con estado `true` de forma paginada. |
-| **GET** | `/topicos/{id}` | Detalle de Tópico | Consulta obligatoria por ID para ver mensaje y autor. |
-| **PUT** | `/topicos/{id}` | Actualizar | Permite modificar título y mensaje actualizando la fecha. |
-| **DELETE** | `/topicos/{id}` | Eliminar | Cambia el estatus a `false` (eliminación lógica). |
+| **POST** | `/login` | Iniciar sesión y obtener JWT | Público |
+
+### Tópicos
+| Método | Endpoint | Acción | Acceso |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/topicos` | Registrar Tópico | Autenticado |
+| **GET** | `/topicos` | Listar Tópicos Activos | Autenticado |
+| **PUT** | `/topicos/{id}` | Actualizar Tópico | Autor/Admin |
+| **DELETE** | `/topicos/{id}` | Borrado Lógico | Moderador/Admin |
+
+### Usuarios y Cursos
+| Método | Endpoint | Acción | Acceso |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/usuarios` | Registrar nuevo usuario | ADMINISTRADOR |
+| **GET** | `/usuarios` | Listar usuarios activos | MODERADOR/ADMIN |
+| **POST** | `/cursos` | Registrar nuevo curso | ADMINISTRADOR |
+
+
+
+## 🚀 Cómo empezar
+
+1.  **Clonar el repositorio**:
+    ```bash
+    git clone [https://github.com/Jvm124/foro.git](https://github.com/Jvm124/foro.git)
+    ```
+2.  **Configurar base de datos**: Crea la base de datos `foro_api` en tu servidor MySQL local.
+3.  **Configurar `application.properties`**:
+    ```properties
+    spring.datasource.url=jdbc:mysql://localhost:3306/foro_api?serverTimezone=America/Lima
+    spring.datasource.username=tu_usuario
+    spring.datasource.password=tu_contrasenia
+    api.security.token.secret=${JWT_SECRET:clave_secreta_para_desarrollo}
+    ```
+4.  **Ejecutar la aplicación**: Flyway aplicará automáticamente las migraciones necesarias para crear las tablas y los perfiles base (ESTUDIANTE, INSTRUCTOR, MODERADOR, ADMINISTRADOR).
 
 ## 👤 Autor
 
@@ -45,4 +79,4 @@ El proyecto está organizado siguiendo el principio de separación de responsabi
 * **Rol:** Desarrollador Web y Estudiante de Ingeniería de Sistemas de Perú
 
 ---
-Desarrollado como parte del desafío de Alura Latam.
+Desarrollado como parte del desafío de **Alura Latam**.
