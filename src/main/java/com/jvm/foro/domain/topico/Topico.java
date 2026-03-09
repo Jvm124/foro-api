@@ -4,7 +4,6 @@ import com.jvm.foro.domain.curso.Curso;
 import com.jvm.foro.domain.respuesta.Respuesta;
 import com.jvm.foro.domain.usuario.Usuario;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

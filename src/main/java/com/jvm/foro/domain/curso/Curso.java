@@ -25,6 +25,29 @@ public class Curso {
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
 
+    private Boolean activo;
+
     @OneToMany(mappedBy = "curso")
     private List<Topico> topicos = new ArrayList<>();
+
+    public Curso(DatosRegistroCurso datos) {
+        this.nombre = datos.nombre();
+        this.categoria = datos.categoria();
+        this.activo = true;
+    }
+
+    public void actualizarInformaciones(DatosActualizarCurso datos) {
+        if (datos.nombre() != null) {
+            this.nombre = datos.nombre();
+        }
+        if (datos.categoria() != null) {
+            this.categoria = datos.categoria();
+        }
+
+    }
+
+
+    public void eliminacionLogica() {
+        this.activo = false;
+    }
 }
